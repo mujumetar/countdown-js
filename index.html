@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: black;
+        color: white;
+    }
+
+    .timer-container {
+        text-align: center;
+    }
+
+    .time-display {
+        font-size: 48px;
+        margin: 20px 0;
+        color: white;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    button {
+        font-size: 18px;
+        padding: 10px 20px;
+        border: 2px solid white;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: transparent;
+        color: white;
+    }
+
+    button:active {
+        background-color: white;
+        color: black;
+    }
+
+    button:disabled {
+        background-color: #333;
+        border-color: #666;
+        color: #666;
+        cursor: not-allowed;
+    }
+
+    .reset-icon {
+        font-size: 24px;
+        cursor: pointer;
+        line-height: 40px;
+        margin: 0 5px;
+    }
+
+    .reset-icon:hover {
+        color: #007BFF;
+    }
+
+    .reset-icon:active {
+        color: #0056b3;
+    }
+</style>
+
+<body>
+    <div class="timer-container">
+        <div class="time-display" id="time-display">00:00</div>
+        <div class="button-group">
+            <button id="add-minute">+1 Minute</button>
+            <button id="subtract-minute">-1 Minute</button>
+        </div>
+        <div class="button-group">
+            <button id="start-timer">Start</button>
+            <span id="reset-icon" class="reset-icon">🔄</span>
+            <button id="pause-timer">Pause</button>
+        </div>
+    </div>
+</body>
+<script>
+    let timerMinutes = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    const timeDisplay = document.getElementById('time-display');
+    const addMinuteButton = document.getElementById('add-minute');
+    const subtractMinuteButton = document.getElementById('subtract-minute');
+    const startButton = document.getElementById('start-timer');
+    const pauseButton = document.getElementById('pause-timer');
+    const resetIcon = document.getElementById('reset-icon');
+
+    function updateTimeDisplay() {
+        const minutes = String(timerMinutes).padStart(2, '0');
+        const seconds = String(timerSeconds).padStart(2, '0');
+        timeDisplay.textContent = `${minutes}:${seconds}`;
+    }
+
+    addMinuteButton.addEventListener('click', () => {
+        timerMinutes++;
+        updateTimeDisplay();
+    });
+
+    subtractMinuteButton.addEventListener('click', () => {
+        if (timerMinutes > 0) {
+            timerMinutes--;
+        } else if (timerSeconds > 0) {
+            timerSeconds = 0; 
+        }
+        updateTimeDisplay();
+    });
+
+    startButton.addEventListener('click', () => {
+        if (timerInterval) return; 
+
+        startButton.disabled = true; 
+        pauseButton.disabled = false; 
+        timerInterval = setInterval(() => {
+            if (timerSeconds === 0) {
+                if (timerMinutes === 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    startButton.disabled = false; 
+                    pauseButton.disabled = true; 
+                    alert('Time is up!');
+                } else {
+                    timerMinutes--;
+                    timerSeconds = 59;
+                }
+            } else {
+                timerSeconds--;
+            }
+            updateTimeDisplay();
+        }, 1000);
+    });
+
+    pauseButton.addEventListener('click', () => {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            startButton.disabled = false; 
+        }
+    });
+
+    resetIcon.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerMinutes = 0;
+        timerSeconds = 0;
+        startButton.disabled = false; 
+        pauseButton.disabled = true;
+        updateTimeDisplay();
+    });
+
+    updateTimeDisplay();
+</script>
+
+</html>
